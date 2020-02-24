@@ -1,0 +1,20 @@
+Package: mizerStarvation
+Type: Package
+Title: Starvation mortality for mizer
+Version: 0.1.0
+Authors@R: c(person("Asata", "Sudzijonyte", 
+                    email = "asta.audzijonyte@utas.edu.au",
+                    role = c("aut", "cre")),
+             person("Gustav", "Delius", 
+                    email = "gustav.delius@york.ac.uk",
+                    role = c("aut")))
+Maintainer: Asta Audzijonyte <asta.audzijonyte@utas.edu.au>
+Description: This is an extension package to implement starvation mortality
+    in the mizer package.
+License: GPL-3
+Imports: 
+  methods,
+  mizer
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
