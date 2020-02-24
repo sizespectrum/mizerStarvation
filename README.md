@@ -20,8 +20,15 @@ install.packages("mizerStarvation")
 ```
 -->
 
-You can install the development version of mizerStarvation from GitHub
-with
+First you need a recent development version of the mizer package
+(version \>= 1.0.1.9001). You can install this from GitHub with
+
+``` r
+devtools::install_github("sizespectrum/mizer")
+```
+
+Then you can install the development version of mizerStarvation from
+GitHub with
 
 ``` r
 devtools::install_github("sizespectrum/mizerStarvation")
@@ -35,9 +42,13 @@ the North Sea model that comes with the mizer package.
 ``` r
 library(mizer)
 library(mizerStarvation)
+library(tidyverse)
 library(ggplot2)
 params <- NS_params
+plotSpectra(params, power = 2)
 ```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
 We add starvation mortality
 
@@ -45,11 +56,11 @@ We add starvation mortality
 params <- setStarvation(NS_params, 10)
 ```
 
-We increase metabolic loss artificially to induce starvation
+We decrease plankton availability to create some starvation
 
 ``` r
-params@species_params$ks <- params@species_params$ks * 1.3
-params <- setMetab(params)
+params@cc_pp[params@w_full > 0.1] <- 0
+params@initial_n_pp[params@w_full > 0.1] <- 0
 ```
 
 We can calculate the starvation mortality for each species as a function
@@ -59,7 +70,8 @@ of size with `getStarvMort()`:
 starv_mort <- getStarvMort(params)
 ```
 
-This returns an array that we can plot
+This returns a matrix. For plotting we turn this into a data frame with
+`melt()` and send it to ggplot:
 
 ``` r
 ggplot(melt(starv_mort)) +
@@ -73,25 +85,12 @@ ggplot(melt(starv_mort)) +
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-We find the new steady state and plot it
+Of course now Saithe will go extinct, not only because of the starvation
+mortality but also because it stops growing before maturity.
 
 ``` r
-params <- steady(params)
-plotSpectra(params, power = 2, ylim = c(1e4, NA))
+sim <- project(params, t_max = 30)
+plotBiomass(sim)
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
-
-Even in the steady state there is still some starvation mortality
-
-``` r
-ggplot(melt(getStarvMort(params))) +
-    geom_line(aes(x = w, y = value, colour = sp, linetype = sp), size = 1) +
-    scale_x_log10() +
-    xlab("Size [g]") +
-    ylab("Starvation mortality [1/year]") +
-    scale_colour_manual(values = params@linecolour) +
-    scale_linetype_manual(values = params@linetype)
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
