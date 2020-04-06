@@ -20,15 +20,8 @@ install.packages("mizerStarvation")
 ```
 -->
 
-First you need a recent development version of the mizer package
-(version \>= 1.0.1.9001). You can install this from GitHub with
-
-``` r
-devtools::install_github("sizespectrum/mizer")
-```
-
-Then you can install the development version of mizerStarvation from
-GitHub with
+You can install the development version of mizerStarvation from GitHub
+with
 
 ``` r
 devtools::install_github("sizespectrum/mizerStarvation")

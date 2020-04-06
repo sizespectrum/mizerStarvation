@@ -13,6 +13,7 @@
 #' @param n_pp A vector of the plankton abundance by size
 #' @param n_other A list of abundances for other dynamical components of the
 #'   ecosystem
+#' @param ... Unused
 #'
 #' @return A two dimensional array of instantaneous starvation mortality
 #'   (species x size).
@@ -30,7 +31,8 @@
 #'
 getStarvMort <- function(params, n = params@initial_n,
                          n_pp = params@initial_n_pp,
-                         n_other = params@initial_n_other) {
+                         n_other = params@initial_n_other,
+                         ...) {
 
     e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other)
     # apply the mortality formula to the whole matrix

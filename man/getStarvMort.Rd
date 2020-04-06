@@ -8,7 +8,8 @@ getStarvMort(
   params,
   n = params@initial_n,
   n_pp = params@initial_n_pp,
-  n_other = params@initial_n_other
+  n_other = params@initial_n_other,
+  ...
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ getStarvMort(
 
 \item{n_other}{A list of abundances for other dynamical components of the
 ecosystem}
+
+\item{...}{Unused}
 }
 \value{
 A two dimensional array of instantaneous starvation mortality
