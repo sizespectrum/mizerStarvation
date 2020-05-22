@@ -33,7 +33,6 @@ This is an artificial example just to illustrate usage. We start with
 the North Sea model that comes with the mizer package.
 
 ``` r
-library(mizer)
 library(mizerStarvation)
 library(tidyverse)
 library(ggplot2)
@@ -49,11 +48,13 @@ We add starvation mortality
 params <- setStarvation(NS_params, 10)
 ```
 
-We decrease plankton availability to create some starvation
+We decrease resource availability to create some starvation
 
 ``` r
-params@cc_pp[params@w_full > 0.1] <- 0
-params@initial_n_pp[params@w_full > 0.1] <- 0
+capacity <- getResourceCapacity(params)
+capacity[w_full(params) > 0.1] <- 0
+params <- setResource(params, resource_capacity = capacity)
+initialNResource(params)[w_full(params) > 0.1] <- 0
 ```
 
 We can calculate the starvation mortality for each species as a function

@@ -1,0 +1,21 @@
+# This is the configuration for the mizer website using the pkgdown package.
+
+url: https://sizespectrum.org/mizerStarvation
+
+authors:
+  Asta Audzijonyte:
+    href: https://www.utas.edu.au/profiles/staff/imas/asta-audzijonyte
+  Gustav Delius:
+    href: https://www.york.ac.uk/maths/staff/gustav-delius/
+
+template:
+  params:
+    bootswatch: cerulean
+
+development:
+  mode: auto
+
+reference:
+- contents:
+    - starts_with("set")
+    - starts_with("get")
