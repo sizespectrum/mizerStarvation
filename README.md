@@ -24,7 +24,7 @@ You can install the development version of mizerStarvation from GitHub
 with
 
 ``` r
-devtools::install_github("sizespectrum/mizerStarvation")
+remotes::install_github("sizespectrum/mizerStarvation")
 ```
 
 ## Example
