@@ -40,13 +40,15 @@
 
 
 <meta property="og:title" content="Get starvation mortality — getStarvMort" />
-<meta property="og:description" content="Calculates starvation mortality based on the equation in the original mizer
-vignette. Starvation mortality is proportional to the energy deficiency and
-is inversely proportional to body weight (and therefore also lipid reserves).
-\(\mu_s(w)\) The weight proportionality constant is currently set to 0.1,
-but could be a separate parameter. The 0.1 constant means that the
-instantaneous starvation mortality is 1 when energy deficit is equal
-individual's body mass." />
+<meta property="og:description" content="Starvation mortality is proportional to the energy deficiency and
+is
+There is no starvation mortality as long as the energy income rate
+\(E_r\) is positive. For details of this rate see
+mizer::getEReproAndGrowth(). Once this rate is negative, the per-capita
+mortality is proportional to this rate and inversely proportional to body
+weight (and therefore also lipid reserves):
+$$\mu_s(w) = \frac{E_r(w)}{w} {\tt starv_coeff} $$
+The proportionality constant is set with setStarvation()." />
 
 
 
@@ -120,13 +122,15 @@ individual's body mass." />
     </div>
 
     <div class="ref-description">
-    <p>Calculates starvation mortality based on the equation in the original mizer
-vignette. Starvation mortality is proportional to the energy deficiency and
-is inversely proportional to body weight (and therefore also lipid reserves).
-\(\mu_s(w)\) The weight proportionality constant is currently set to 0.1,
-but could be a separate parameter. The 0.1 constant means that the
-instantaneous starvation mortality is 1 when energy deficit is equal
-individual's body mass.</p>
+    <p>Starvation mortality is proportional to the energy deficiency and
+is
+There is no starvation mortality as long as the energy income rate
+\(E_r\) is positive. For details of this rate see
+<code><a href='https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html'>mizer::getEReproAndGrowth()</a></code>. Once this rate is negative, the per-capita
+mortality is proportional to this rate and inversely proportional to body
+weight (and therefore also lipid reserves):
+$$\mu_s(w) = \frac{E_r(w)}{w} {\tt starv_coeff} $$
+The proportionality constant is set with <code><a href='setStarvation.html'>setStarvation()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>getStarvMort</span>(
@@ -166,18 +170,7 @@ ecosystem</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A two dimensional array of instantaneous starvation mortality
-  (species x size).</p>
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
-
-    <p>The default value of starv_coef is 10, which scales how energy intake
-  deficit (e) translates to starvation mortality. When instantaneous energy
-  intake rate deficit per year is 10<!-- % of body weight it will give -->
-  instantaneous starvation mortality rate of 1/year, i.e. an average
-  individual can survive for about a year. If starv_coef = 0, there is no
-  starvation mortality and negative intake just gets converted to 0 (there is
-  no cost to having negative energy intake, which is unrealistic!). If
-  starv_coef = 20, the cost of negative intake increases, and 10<!-- % energy -->
-  deficit will lead to instantaneous starvation mortality of 2/year.</p>
+(species x size).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

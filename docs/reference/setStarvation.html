@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set starvation mortality — setStarvation • mizerStarvation</title>
+<title>Set starvation mortality. — setStarvation • mizerStarvation</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Set starvation mortality — setStarvation" />
-<meta property="og:description" content="Set starvation mortality" />
+<meta property="og:title" content="Set starvation mortality. — setStarvation" />
+<meta property="og:description" content="For more details see getStarvMort()." />
 
 
 
@@ -108,13 +108,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Set starvation mortality</h1>
+    <h1>Set starvation mortality.</h1>
     <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerStarvation/blob/master/R/setStarvation.R'><code>R/setStarvation.R</code></a></small>
     <div class="hidden name"><code>setStarvation.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Set starvation mortality</p>
+    <p>For more details see <code><a href='getStarvMort.html'>getStarvMort()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>setStarvation</span>(<span class='no'>params</span>, <span class='kw'>starv_coef</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
@@ -128,10 +128,10 @@
     </tr>
     <tr>
       <th>starv_coef</th>
-      <td><p>Proportionality constant for starvation mortality. When
-<code>starv_coef</code> is equal to 10 the instantaneous starvation mortality (1/year)
-is 1 when energy deficit is 10% of body weight. When <code>starv_coef = 0</code> there
-is no starvation mortality</p></td>
+      <td><p>Proportionality constant for starvation mortality. the
+default is <code>starv_coef = 10</code>, which has the effect that the instantaneous
+starvation mortality (1/year) is 1 when the energy deficit is 10% of body
+weight. When <code>starv_coef = 0</code> there is no starvation mortality</p></td>
     </tr>
     </table>
 
