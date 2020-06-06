@@ -23,3 +23,5 @@ LazyData: true
 RoxygenNote: 7.1.0
 URL: https://sizespectrum.org/mizerStarvation, https://github.com/sizespectrum/mizerStarvation
 BugReports: https://github.com/sizespectrum/mizerStarvation/issues
+Suggests: 
+    testthat
