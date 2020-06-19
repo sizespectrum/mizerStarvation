@@ -36,7 +36,7 @@ There is no starvation mortality as long as the energy income rate
 \code{mizer::getEReproAndGrowth()}. Once this rate is negative, the per-capita
 mortality is proportional to this rate and inversely proportional to body
 weight (and therefore also lipid reserves):
-\deqn{\mu_s(w) = \frac{E_r(w)}{w} {\tt starv_coeff} }{mu_s(w) = E_r(w)/w * starv\_coeff}
+\deqn{\mu_s(w) = \frac{E_r(w)}{w} {\tt starv\_coeff} }{mu_s(w) = E_r(w)/w * starv_coeff}
 The proportionality constant is set with \code{setStarvation()}.
 }
 \concept{rate functions}

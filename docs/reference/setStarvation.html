@@ -40,7 +40,11 @@
 
 
 <meta property="og:title" content="Set starvation mortality. — setStarvation" />
-<meta property="og:description" content="For more details see getStarvMort()." />
+<meta property="og:description" content="Initially, a MizerParams object set up with the mizer setup functions will
+have no starvation mortality. This function returns a MizerParams object
+with starvation mortality enabled, unless you set starv_coef = 0, which
+will disable starvation mortality again. For the details of how starvation
+mortality is modelled see getStarvMort()." />
 
 
 
@@ -114,7 +118,11 @@
     </div>
 
     <div class="ref-description">
-    <p>For more details see <code><a href='getStarvMort.html'>getStarvMort()</a></code>.</p>
+    <p>Initially, a MizerParams object set up with the mizer setup functions will
+have no starvation mortality. This function returns a MizerParams object
+with starvation mortality enabled, unless you set <code>starv_coef = 0</code>, which
+will disable starvation mortality again. For the details of how starvation
+mortality is modelled see <code><a href='getStarvMort.html'>getStarvMort()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>setStarvation</span>(<span class='no'>params</span>, <span class='kw'>starv_coef</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
@@ -131,7 +139,9 @@
       <td><p>Proportionality constant for starvation mortality. the
 default is <code>starv_coef = 10</code>, which has the effect that the instantaneous
 starvation mortality (1/year) is 1 when the energy deficit is 10% of body
-weight. When <code>starv_coef = 0</code> there is no starvation mortality</p></td>
+weight. When <code>starv_coef = 0</code> there is no starvation mortality. You can
+set a different value for each species by providing a vector with length
+equal to the number of species in the model.</p></td>
     </tr>
     </table>
 
