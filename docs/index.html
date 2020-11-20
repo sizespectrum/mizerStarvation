@@ -84,39 +84,46 @@ install.packages("mizerStarvation")
 ```
 -->
 <p>You can install the development version of mizerStarvation from GitHub with</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"sizespectrum/mizerStarvation"</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"sizespectrum/mizerStarvation"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
 <p>This is an artificial example just to illustrate usage. We start with the North Sea model that comes with the mizer package.</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">mizerStarvation</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyverse</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="no">params</span> <span class="kw">&lt;-</span> <span class="no">NS_params</span>
-<span class="fu">plotSpectra</span>(<span class="no">params</span>, <span class="kw">power</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sizespectrum.org/mizerStarvation">mizerStarvation</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="va">params</span> <span class="op">&lt;-</span> <span class="va">NS_params</span>
+<span class="fu">plotSpectra</span><span class="op">(</span><span class="va">params</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
 <p>We add starvation mortality</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="no">params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/setStarvation.html">setStarvation</a></span>(<span class="no">NS_params</span>, <span class="fl">10</span>)</pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setStarvation.html">setStarvation</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <p>We decrease resource availability to create some starvation</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="no">capacity</span> <span class="kw">&lt;-</span> <span class="fu">getResourceCapacity</span>(<span class="no">params</span>)
-<span class="no">capacity</span>[<span class="fu">w_full</span>(<span class="no">params</span>) <span class="kw">&gt;</span> <span class="fl">0.1</span>] <span class="kw">&lt;-</span> <span class="fl">0</span>
-<span class="no">params</span> <span class="kw">&lt;-</span> <span class="fu">setResource</span>(<span class="no">params</span>, <span class="kw">resource_capacity</span> <span class="kw">=</span> <span class="no">capacity</span>)
-<span class="fu">initialNResource</span>(<span class="no">params</span>)[<span class="fu">w_full</span>(<span class="no">params</span>) <span class="kw">&gt;</span> <span class="fl">0.1</span>] <span class="kw">&lt;-</span> <span class="fl">0</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">capacity</span> <span class="op">&lt;-</span> <span class="fu">getResourceCapacity</span><span class="op">(</span><span class="va">params</span><span class="op">)</span>
+<span class="va">capacity</span><span class="op">[</span><span class="fu">w_full</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span>
+<span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setResource</span><span class="op">(</span><span class="va">params</span>, resource_capacity <span class="op">=</span> <span class="va">capacity</span><span class="op">)</span>
+<span class="fu">initialNResource</span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">[</span><span class="fu">w_full</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></code></pre></div>
 <p>We can calculate the starvation mortality for each species as a function of size with <code><a href="reference/getStarvMort.html">getStarvMort()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="r"><span class="no">starv_mort</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/getStarvMort.html">getStarvMort</a></span>(<span class="no">params</span>)</pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">starv_mort</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/getStarvMort.html">getStarvMort</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></code></pre></div>
 <p>This returns a matrix. For plotting we turn this into a data frame with <code>melt()</code> and send it to ggplot:</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="fu">melt</span>(<span class="no">starv_mort</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">w</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">value</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">sp</span>, <span class="kw">linetype</span> <span class="kw">=</span> <span class="no">sp</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_log10</a></span>() +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Size [g]"</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Starvation mortality [1/year]"</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">params</span>@<span class="kw">linecolour</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_linetype_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">params</span>@<span class="kw">linetype</span>)</pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu">melt</span><span class="op">(</span><span class="va">starv_mort</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">w</span>, y <span class="op">=</span> <span class="va">value</span>, colour <span class="op">=</span> <span class="va">sp</span>, linetype <span class="op">=</span> <span class="va">sp</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Size [g]"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Starvation mortality [1/year]"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">params</span><span class="op">@</span><span class="va">linecolour</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_linetype_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">params</span><span class="op">@</span><span class="va">linetype</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
 <p>Of course now Saithe will go extinct, not only because of the starvation mortality but also because it stops growing before maturity.</p>
-<div class="sourceCode" id="cb7"><pre class="r"><span class="no">sim</span> <span class="kw">&lt;-</span> <span class="fu">project</span>(<span class="no">params</span>, <span class="kw">t_max</span> <span class="kw">=</span> <span class="fl">30</span>)
-<span class="fu">plotBiomass</span>(<span class="no">sim</span>)</pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">project</span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>
+<span class="fu">plotBiomass</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 </div>
@@ -157,7 +164,7 @@ install.packages("mizerStarvation")
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

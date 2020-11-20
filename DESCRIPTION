@@ -20,7 +20,7 @@ Imports:
   methods
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 URL: https://sizespectrum.org/mizerStarvation, https://github.com/sizespectrum/mizerStarvation
 BugReports: https://github.com/sizespectrum/mizerStarvation/issues
 Suggests: 

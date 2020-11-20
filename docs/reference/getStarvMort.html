@@ -40,15 +40,13 @@
 
 
 <meta property="og:title" content="Get starvation mortality — getStarvMort" />
-<meta property="og:description" content="Starvation mortality is proportional to the energy deficiency and
-is
-There is no starvation mortality as long as the energy income rate
+<meta property="og:description" content="There is no starvation mortality as long as the energy income rate
 \(E_r\) is positive. For details of this rate see
 mizer::getEReproAndGrowth(). Once this rate is negative, the per-capita
 mortality is proportional to this rate and inversely proportional to body
 weight (and therefore also lipid reserves):
-$$\mu_s(w) = \frac{E_r(w)}{w} {\tt starv\_coeff} $$
-The proportionality constant is set with setStarvation()." />
+$$\mu_s(w) = \frac{-E_r(w)}{w} {\tt starv\_coeff} $$
+The proportionality constant starv_coeff is set with setStarvation()." />
 
 
 
@@ -122,24 +120,22 @@ The proportionality constant is set with setStarvation()." />
     </div>
 
     <div class="ref-description">
-    <p>Starvation mortality is proportional to the energy deficiency and
-is
-There is no starvation mortality as long as the energy income rate
+    <p>There is no starvation mortality as long as the energy income rate
 \(E_r\) is positive. For details of this rate see
 <code><a href='https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html'>mizer::getEReproAndGrowth()</a></code>. Once this rate is negative, the per-capita
 mortality is proportional to this rate and inversely proportional to body
 weight (and therefore also lipid reserves):
-$$\mu_s(w) = \frac{E_r(w)}{w} {\tt starv\_coeff} $$
-The proportionality constant is set with <code><a href='setStarvation.html'>setStarvation()</a></code>.</p>
+$$\mu_s(w) = \frac{-E_r(w)}{w} {\tt starv\_coeff} $$
+The proportionality constant <code>starv_coeff</code> is set with <code><a href='setStarvation.html'>setStarvation()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getStarvMort</span>(
-  <span class='no'>params</span>,
-  <span class='kw'>n</span> <span class='kw'>=</span> <span class='no'>params</span>@<span class='kw'>initial_n</span>,
-  <span class='kw'>n_pp</span> <span class='kw'>=</span> <span class='no'>params</span>@<span class='kw'>initial_n_pp</span>,
-  <span class='kw'>n_other</span> <span class='kw'>=</span> <span class='no'>params</span>@<span class='kw'>initial_n_other</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>getStarvMort</span><span class='op'>(</span>
+  <span class='va'>params</span>,
+  n <span class='op'>=</span> <span class='va'>params</span><span class='op'>@</span><span class='va'>initial_n</span>,
+  n_pp <span class='op'>=</span> <span class='va'>params</span><span class='op'>@</span><span class='va'>initial_n_pp</span>,
+  n_other <span class='op'>=</span> <span class='va'>params</span><span class='op'>@</span><span class='va'>initial_n_other</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,7 +183,7 @@ ecosystem</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
