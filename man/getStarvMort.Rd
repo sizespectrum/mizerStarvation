@@ -2,6 +2,7 @@
 % Please edit documentation in R/getStarvMort.R
 \name{getStarvMort}
 \alias{getStarvMort}
+\alias{starvMort}
 \title{Get starvation mortality}
 \usage{
 getStarvMort(
@@ -11,6 +12,8 @@ getStarvMort(
   n_other = params@initial_n_other,
   ...
 )
+
+starvMort(params, n, n_pp, n_other, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}

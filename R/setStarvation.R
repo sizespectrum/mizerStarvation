@@ -37,7 +37,7 @@ setStarvation <- function(params,
     params@species_params[["starv_coef"]] <- starv_coef
 
     # Hook into mizer
-    params@other_mort[["starvation"]] <- "getStarvMort"
+    params@other_mort[["starvation"]] <- "starvMort"
     
     if (!("mizerStarvation" %in% names(params@extensions))) {
         params@extensions <- c(mizerStarvation = "sizespectrum/mizerStarvation",

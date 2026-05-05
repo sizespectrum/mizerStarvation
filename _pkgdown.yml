@@ -9,6 +9,7 @@ authors:
     href: https://www.york.ac.uk/maths/staff/gustav-delius/
 
 template:
+  bootstrap: 5
   params:
     bootswatch: cerulean
 

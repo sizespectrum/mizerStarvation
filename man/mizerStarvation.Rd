@@ -9,3 +9,23 @@
 This is an extension package for the mizer package
 (https://sizespectrum.org/mizer/) to implement starvation mortality.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://sizespectrum.org/mizerStarvation}
+  \item \url{https://github.com/sizespectrum/mizerStarvation}
+  \item Report bugs at \url{https://github.com/sizespectrum/mizerStarvation/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Asta Audzijonyte \email{asta.audzijonyte@utas.edu.au} (\href{https://orcid.org/0000-0002-9919-9376}{ORCID})
+
+Authors:
+\itemize{
+  \item Asta Audzijonyte \email{asta.audzijonyte@utas.edu.au} (\href{https://orcid.org/0000-0002-9919-9376}{ORCID})
+  \item Gustav Delius \email{gustav.delius@york.ac.uk} (\href{https://orcid.org/0000-0003-4092-8228}{ORCID})
+}
+
+}
+\keyword{internal}

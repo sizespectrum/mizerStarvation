@@ -1,6 +1,6 @@
 test_that("Starvation mortality is correctly set and unset", {
     params <- setStarvation(NS_params)
-    expect_identical(params@other_mort$starvation, "getStarvMort")
+    expect_identical(params@other_mort$starvation, "starvMort")
     expect_identical(params@species_params$starv_coef, rep(10, 12))
     # test that extension field in metadata is set
     expect_equal(getMetadata(params)$extensions[["mizerStarvation"]],

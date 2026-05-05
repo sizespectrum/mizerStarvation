@@ -25,7 +25,25 @@ getStarvMort <- function(params, n = params@initial_n,
                          n_pp = params@initial_n_pp,
                          n_other = params@initial_n_other,
                          ...) {
+    params <- validParams(params)
+    assert_that(is.array(n),
+                is.numeric(n_pp),
+                is.list(n_other),
+                identical(dim(n), dim(params@initial_n)),
+                identical(length(n_pp), length(params@initial_n_pp)),
+                identical(length(n_other), length(params@initial_n_other))
+    )
+    starv_mort <- starvMort(params, n = initialN(params), 
+                            n_pp = initialNResource(params),
+                            n_other = initialNOther(params),
+                            ...)
+    ArraySpeciesBySize(starv_mort, value_name = "Starvation mortality",
+                       units = "1/year", params = params)
+}
 
+#' @rdname getStarvMort
+#' @export
+starvMort <- function(params, n, n_pp, n_other, ...) {
     e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other)
     # apply the mortality formula to the whole matrix
     mu_s <- -t(t(e * params@species_params$starv_coef) / params@w)

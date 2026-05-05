@@ -2,5 +2,7 @@
 
 export(getStarvMort)
 export(setStarvation)
+export(starvMort)
+import(assertthat)
 import(mizer)
 importFrom(methods,validObject)
