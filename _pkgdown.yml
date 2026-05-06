@@ -12,6 +12,18 @@ template:
   bootstrap: 5
   params:
     bootswatch: cerulean
+  light-switch: true
+  math-rendering: mathjax
+
+navbar:
+  structure:
+    left: [articles, reference, news]
+    right: [mizer, github]
+  components:
+    home: ~
+    mizer:
+      text: mizer Home
+      href: https://sizespectrum.org/mizer
 
 development:
   mode: auto

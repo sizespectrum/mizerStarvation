@@ -7,5 +7,6 @@
 #' @importFrom methods validObject
 #' @name mizerStarvation
 #' @aliases mizerStarvation-package
+#' @md
 #' @keywords internal
 "_PACKAGE"
