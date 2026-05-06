@@ -72,8 +72,7 @@ and restored with the `MizerParams` object.
 `setStarvation()` inserts an entry into the `params@extensions` named vector:
 
 ```{r show-extensions, eval = FALSE}
-params@extensions[["mizerStarvation"]]
-#> [1] "sizespectrum/mizerStarvation"
+params@extensions
 ```
 
 This records which extension package was used to set up the model. It makes
