@@ -10,3 +10,7 @@
 #' @md
 #' @keywords internal
 "_PACKAGE"
+
+.onLoad <- function(libname, pkgname) {
+    mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerStarvation")
+}

@@ -67,17 +67,40 @@ because `starv_coef` varies by species. It is also the standard place mizer
 uses to keep per-species biological parameters, so it is automatically saved
 and restored with the `MizerParams` object.
 
-# Recording the extension
+# Registering with mizer on load
 
-`setStarvation()` inserts an entry into the `params@extensions` named vector:
+When mizerStarvation is loaded, its `.onLoad` hook registers the package with
+mizer:
+
+```r
+.onLoad <- function(libname, pkgname) {
+  mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerStarvation")
+}
+```
+
+This adds `mizerStarvation` to the session's extension chain. The `requirement`
+string is a `pak` installation spec, so mizer can install the package
+automatically if it is missing. The call is idempotent: reloading the package
+(e.g. via `devtools::load_all()`) does not modify the chain a second time.
+
+# Recording the extension in the params object
+
+`setStarvation()` copies the session's registered extension chain into
+`params@extensions`:
 
 ```{r show-extensions, eval = FALSE}
 params@extensions
 ```
 
-This records which extension package was used to set up the model. It makes
-it possible for mizer to warn users when they try to use a saved model in a
-session where mizerStarvation is not installed.
+Because `.onLoad` has already registered mizerStarvation by the time the user
+calls `setStarvation()`, the chain returned by `getRegisteredExtensions()`
+includes `"mizerStarvation"`. Storing this in the object lets mizer warn users
+who try to load a saved model in a session where mizerStarvation is not
+installed.
+
+When starvation mortality is disabled by passing `starv_coef = 0`,
+`setStarvation()` also removes `"mizerStarvation"` from `params@extensions`,
+so the saved object no longer requires the package.
 
 # How the pieces fit together
 

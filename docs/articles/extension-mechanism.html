@@ -87,7 +87,7 @@ mortality rate pipeline rather than replacing it.</p>
 </h2>
 <p>The <code>MizerParams</code> object carries a slot
 <code>other_mort</code>: a named list of rate function names. During
-every time step, <code><a href="https://sizespectrum.org/mizer/reference/getMort.html" class="external-link">getMort()</a></code> calls each function in this list
+every time step, <code>getMort()</code> calls each function in this list
 and adds its return value to the total per-capita mortality rate. This
 is the correct tool when:</p>
 <ul>
@@ -115,30 +115,52 @@ column of the <code>species_params</code> data frame:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">[[</span><span class="st">"starv_coef"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <p>Using <code>species_params</code> rather than
-<code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">other_params()</a></code> is appropriate here because
+<code>other_params()</code> is appropriate here because
 <code>starv_coef</code> varies by species. It is also the standard place
 mizer uses to keep per-species biological parameters, so it is
 automatically saved and restored with the <code>MizerParams</code>
 object.</p>
 </div>
 <div class="section level2">
-<h2 id="recording-the-extension">Recording the extension<a class="anchor" aria-label="anchor" href="#recording-the-extension"></a>
+<h2 id="registering-with-mizer-on-load">Registering with mizer on load<a class="anchor" aria-label="anchor" href="#registering-with-mizer-on-load"></a>
 </h2>
-<p><code><a href="../reference/setStarvation.html">setStarvation()</a></code> inserts an entry into the
-<code>params@extensions</code> named vector:</p>
+<p>When mizerStarvation is loaded, its <code>.onLoad</code> hook
+registers the package with mizer:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">params</span><span class="op">@</span><span class="va">extensions</span><span class="op">[[</span><span class="st">"mizerStarvation"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "sizespectrum/mizerStarvation"</span></span></code></pre></div>
-<p>This records which extension package was used to set up the model. It
-makes it possible for mizer to warn users when they try to use a saved
-model in a session where mizerStarvation is not installed.</p>
+<code class="sourceCode R"><span><span class="va">.onLoad</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">libname</span>, <span class="va">pkgname</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/registerExtension.html" class="external-link">registerExtension</a></span><span class="op">(</span><span class="va">pkgname</span>, requirement <span class="op">=</span> <span class="st">"sizespectrum/mizerStarvation"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>This adds <code>mizerStarvation</code> to the session’s extension
+chain. The <code>requirement</code> string is a <code>pak</code>
+installation spec, so mizer can install the package automatically if it
+is missing. The call is idempotent: reloading the package (e.g. via
+<code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>) does not modify the chain a second
+time.</p>
+</div>
+<div class="section level2">
+<h2 id="recording-the-extension-in-the-params-object">Recording the extension in the params object<a class="anchor" aria-label="anchor" href="#recording-the-extension-in-the-params-object"></a>
+</h2>
+<p><code><a href="../reference/setStarvation.html">setStarvation()</a></code> copies the session’s registered
+extension chain into <code>params@extensions</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">params</span><span class="op">@</span><span class="va">extensions</span></span></code></pre></div>
+<p>Because <code>.onLoad</code> has already registered mizerStarvation
+by the time the user calls <code><a href="../reference/setStarvation.html">setStarvation()</a></code>, the chain
+returned by <code>getRegisteredExtensions()</code> includes
+<code>"mizerStarvation"</code>. Storing this in the object lets mizer
+warn users who try to load a saved model in a session where
+mizerStarvation is not installed.</p>
+<p>When starvation mortality is disabled by passing
+<code>starv_coef = 0</code>, <code><a href="../reference/setStarvation.html">setStarvation()</a></code> also removes
+<code>"mizerStarvation"</code> from <code>params@extensions</code>, so
+the saved object no longer requires the package.</p>
 </div>
 <div class="section level2">
 <h2 id="how-the-pieces-fit-together">How the pieces fit together<a class="anchor" aria-label="anchor" href="#how-the-pieces-fit-together"></a>
 </h2>
 <p><code><a href="../reference/setStarvation.html">setStarvation()</a></code> sets up all three pieces in one
 call:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setStarvation.html">setStarvation</a></span><span class="op">(</span><span class="va">params</span>, starv_coef <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p>Passing <code>starv_coef = 0</code> reverses the change: it removes
 the <code>"starvation"</code> entry from <code>other_mort</code>,
@@ -147,16 +169,16 @@ removes the <code>starv_coef</code> column from
 from <code>params@extensions</code>.</p>
 <p>During a projection, at each time step and for each species and size
 class, mizer calls <code><a href="../reference/getStarvMort.html">starvMort()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">starvMort</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html" class="external-link">getEReproAndGrowth</a></span><span class="op">(</span><span class="va">params</span>, n <span class="op">=</span> <span class="va">n</span>, n_pp <span class="op">=</span> <span class="va">n_pp</span>, <span class="va">n_other</span><span class="op">)</span></span>
+<span>    <span class="va">e</span> <span class="op">&lt;-</span> <span class="fu">getEReproAndGrowth</span><span class="op">(</span><span class="va">params</span>, n <span class="op">=</span> <span class="va">n</span>, n_pp <span class="op">=</span> <span class="va">n_pp</span>, <span class="va">n_other</span><span class="op">)</span></span>
 <span>    <span class="va">mu_s</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">e</span> <span class="op">*</span> <span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">$</span><span class="va">starv_coef</span><span class="op">)</span> <span class="op">/</span> <span class="va">params</span><span class="op">@</span><span class="va">w</span><span class="op">)</span></span>
 <span>    <span class="va">mu_s</span><span class="op">[</span><span class="va">e</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">mu_s</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The function:</p>
 <ol style="list-style-type: decimal">
-<li>Calls the standard mizer function <code><a href="https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html" class="external-link">getEReproAndGrowth()</a></code>
+<li>Calls the standard mizer function <code>getEReproAndGrowth()</code>
 to get the energy available for growth and reproduction, <span class="math inline">\(E_r(w)\)</span>, at the current community
 state.</li>
 <li>Computes the starvation mortality rate <span class="math display">\[\mu_s(w) = \frac{-E_r(w)}{w} \times
@@ -166,7 +188,7 @@ is negative (<span class="math inline">\(E_r &lt; 0\)</span>).</li>
 balance.</li>
 </ol>
 <p>The result is a species-by-size matrix with the same dimensions as
-<code>initialN(params)</code>, which <code><a href="https://sizespectrum.org/mizer/reference/getMort.html" class="external-link">getMort()</a></code> adds to the
+<code>initialN(params)</code>, which <code>getMort()</code> adds to the
 other mortality terms.</p>
 </div>
 <div class="section level2">
@@ -187,7 +209,7 @@ other mortality terms.</p>
 <tr class="odd">
 <td><code>params@other_mort</code></td>
 <td>named list of rate function names</td>
-<td>registers <code>starvMort</code> so <code><a href="https://sizespectrum.org/mizer/reference/getMort.html" class="external-link">getMort()</a></code> calls it
+<td>registers <code>starvMort</code> so <code>getMort()</code> calls it
 at each time step</td>
 </tr>
 <tr class="even">
@@ -202,8 +224,8 @@ at each time step</td>
 </tr>
 </tbody>
 </table>
-<p>This package does not use <code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">setRateFunction()</a></code>,
-<code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent()</a></code>, <code><a href="https://sizespectrum.org/mizer/reference/setExtMort.html" class="external-link">setExtMort()</a></code>, or S4
+<p>This package does not use <code>setRateFunction()</code>,
+<code>setComponent()</code>, <code>setExtMort()</code>, or S4
 subclassing, because those mechanisms are either designed for replacing
 rather than augmenting existing rates, or add more infrastructure than
 this simple additive mortality term requires.</p>

@@ -28,6 +28,7 @@ setStarvation <- function(params,
     if (all(starv_coef == 0)) {
         params@other_mort[["starvation"]] <- NULL
         params@species_params[["starv_coef"]] <- NULL
+        params@extensions <- params@extensions[names(params@extensions) != "mizerStarvation"]
         return(params)
     }
 
