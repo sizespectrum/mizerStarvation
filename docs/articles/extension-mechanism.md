@@ -30,6 +30,7 @@ per-capita mortality rate. This is the correct tool when:
 mizerStarvation registers its rate function into this list:
 
 ``` r
+
 params@other_mort[["starvation"]]
 #> [1] "starvMort"
 ```
@@ -47,7 +48,8 @@ one value per species. This is stored as a column of the
 `species_params` data frame:
 
 ``` r
-params@species_params[["starv_coef"]]
+
+species_params(params)[["starv_coef"]]
 ```
 
 Using `species_params` rather than
@@ -56,19 +58,91 @@ is appropriate here because `starv_coef` varies by species. It is also
 the standard place mizer uses to keep per-species biological parameters,
 so it is automatically saved and restored with the `MizerParams` object.
 
-## Recording the extension
-
 [`setStarvation()`](https://sizespectrum.org/mizerStarvation/reference/setStarvation.md)
-inserts an entry into the `params@extensions` named vector:
+writes the column with the
+[`given_species_params()`](https://sizespectrum.org/mizer/reference/species_params.html)
+replacement function rather than by assigning to the `species_params`
+slot directly:
 
 ``` r
-params@extensions[["mizerStarvation"]]
-#> [1] "sizespectrum/mizerStarvation"
+
+given_species_params(params)[["starv_coef"]] <- starv_coef
 ```
 
-This records which extension package was used to set up the model. It
-makes it possible for mizer to warn users when they try to use a saved
-model in a session where mizerStarvation is not installed.
+`starv_coef` is user input that mizer never calculates for itself, so
+declaring it as a *given* species parameter records that provenance. It
+then shows up in `given_species_params(params)` alongside the other
+parameters the user supplied, rather than in
+`calculated_species_params(params)`.
+
+## Registering with mizer on load
+
+When mizerStarvation is loaded, its `.onLoad` hook registers the package
+with mizer:
+
+``` r
+
+.onLoad <- function(libname, pkgname) {
+  mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerStarvation")
+}
+```
+
+This adds `mizerStarvation` to the session’s extension chain. The
+`requirement` string is a `pak` installation spec, so mizer can install
+the package automatically if it is missing. The call is idempotent:
+reloading the package (e.g. via
+[`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html))
+does not modify the chain a second time.
+
+## Recording the extension in the params object
+
+Registering the package in `.onLoad` only announces it to the *session*.
+A `MizerParams` object additionally records which extensions were
+actually applied to it, in its `extensions` slot:
+
+``` r
+
+params@extensions
+#> $mizerStarvation
+#>                    requirement                        version 
+#> "sizespectrum/mizerStarvation"                        "0.2.0" 
+```
+
+[`setStarvation()`](https://sizespectrum.org/mizerStarvation/reference/setStarvation.md)
+writes that entry with
+[`mizer::recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html):
+
+``` r
+
+params <- recordExtension(params, "mizerStarvation", version = version)
+```
+
+[`recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html)
+takes the installation requirement from the session’s registered chain,
+preserves any entries other extensions have already made, and inserts
+this one at the right position in the chain. This is deliberately
+narrower than copying the whole of
+[`getRegisteredExtensions()`](https://sizespectrum.org/mizer/reference/getRegisteredExtensions.html)
+into the object: another extension package may well be loaded in the
+session without having been applied to *this* model, and the slot is a
+record of what was applied, not of what happened to be attached.
+
+The `version` argument is the version of mizerStarvation whose object
+layout the recorded component conforms to.
+[`setStarvation()`](https://sizespectrum.org/mizerStarvation/reference/setStarvation.md)
+stamps the installed version only when it first adds starvation
+mortality to a model, and passes `version = NULL` on subsequent calls so
+that an existing stamp is preserved. Re-stamping on an ordinary
+modification would let an old object claim to be current and so skip a
+migration it actually needs.
+
+Storing this record lets mizer warn users who try to load a saved model
+in a session where mizerStarvation is missing or out of date.
+
+When starvation mortality is disabled by passing `starv_coef = 0`,
+[`setStarvation()`](https://sizespectrum.org/mizerStarvation/reference/setStarvation.md)
+removes the `"mizerStarvation"` entry from `params@extensions` again, so
+the saved object no longer requires the package.
 
 ## How the pieces fit together
 
@@ -76,6 +150,7 @@ model in a session where mizerStarvation is not installed.
 sets up all three pieces in one call:
 
 ``` r
+
 params <- setStarvation(params, starv_coef = 10)
 ```
 
@@ -89,13 +164,23 @@ class, mizer calls
 [`starvMort()`](https://sizespectrum.org/mizerStarvation/reference/getStarvMort.md):
 
 ``` r
-starvMort <- function(params, n, n_pp, n_other, ...) {
-    e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other)
-    mu_s <- -t(t(e * params@species_params$starv_coef) / params@w)
+
+starvMort <- function(params, n, n_pp, n_other, t = 0, ...) {
+    e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other = n_other,
+                            t = t)
+    starv_coef <- species_params(params)[["starv_coef"]]
+    mu_s <- -t(t(e * starv_coef) / params@w)
     mu_s[e > 0] <- 0
-    return(mu_s)
+    mu_s
 }
 ```
+
+[`getMort()`](https://sizespectrum.org/mizer/reference/getMort.html)
+calls each `other_mort` function with `params`, `n`, `n_pp`, `n_other`,
+`t` and the `component` name, so a rate function has to accept `...` to
+absorb the arguments it does not use. Note that `t` is named explicitly
+here and forwarded, so that starvation mortality is computed at the same
+time as the rest of the mortality in models whose rates depend on time.
 
 The function:
 
@@ -119,8 +204,8 @@ adds to the other mortality terms.
 | Mechanism | Where | Purpose |
 |----|----|----|
 | `params@other_mort` | named list of rate function names | registers `starvMort` so [`getMort()`](https://sizespectrum.org/mizer/reference/getMort.html) calls it at each time step |
-| `params@species_params$starv_coef` | column in species parameters | stores the per-species proportionality constant |
-| `params@extensions` | named character vector | records that mizerStarvation set up this model |
+| `species_params(params)$starv_coef` | column in species parameters, written with `given_species_params<-()` | stores the per-species proportionality constant |
+| `params@extensions` | named list written with [`recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html) | records that mizerStarvation set up this model, and under which version |
 
 This package does not use
 [`setRateFunction()`](https://sizespectrum.org/mizer/reference/setRateFunction.html),

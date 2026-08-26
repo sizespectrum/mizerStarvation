@@ -16,13 +16,13 @@ Source:
 [`DESCRIPTION`](https://github.com/sizespectrum/mizerStarvation/blob/HEAD/DESCRIPTION)
 
 Audzijonyte A, Delius G (2026). *mizerStarvation: Starvation mortality
-for mizer*. R package version 0.1.1,
+for mizer*. R package version 0.2.0,
 <https://sizespectrum.org/mizerStarvation>.
 
     @Manual{,
       title = {mizerStarvation: Starvation mortality for mizer},
       author = {Asta Audzijonyte and Gustav Delius},
       year = {2026},
-      note = {R package version 0.1.1},
+      note = {R package version 0.2.0},
       url = {https://sizespectrum.org/mizerStarvation},
     }

@@ -1,7 +1,7 @@
 Package: mizerStarvation
 Type: Package
 Title: Starvation mortality for mizer
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(person("Asta", "Audzijonyte", 
                     email = "asta.audzijonyte@utas.edu.au",
                     role = c("aut", "cre"),
@@ -15,9 +15,9 @@ Description: This is an extension package to implement starvation mortality
     in the mizer package.
 License: GPL-3
 Depends:
-  mizer (>= 2.3.0)
+  mizer (>= 3.3.0)
 Imports: 
-  methods,
+  utils,
   assertthat
 Encoding: UTF-8
 LazyData: true
@@ -27,5 +27,5 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 VignetteBuilder: knitr

@@ -4,7 +4,7 @@
 #' (https://sizespectrum.org/mizer/) to implement starvation mortality.
 #'
 #' @import mizer assertthat
-#' @importFrom methods validObject
+#' @importFrom utils packageVersion
 #' @name mizerStarvation
 #' @aliases mizerStarvation-package
 #' @md

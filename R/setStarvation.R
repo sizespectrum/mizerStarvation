@@ -18,7 +18,7 @@
 #' @export
 setStarvation <- function(params,
                           starv_coef = 10) {
-    validObject(params)
+    params <- validParams(params)
     if (length(starv_coef) != 1 &&
         length(starv_coef) != nrow(params@species_params)) {
         stop("`starv_coef` must be a single number or a vector with one entry for each species.")
@@ -27,18 +27,29 @@ setStarvation <- function(params,
     # Disable starvation mortality if starv_coef = 0
     if (all(starv_coef == 0)) {
         params@other_mort[["starvation"]] <- NULL
+        # Hand `starv_coef` back to mizer and then drop the column entirely
+        given_species_params(params)[["starv_coef"]] <- NULL
         params@species_params[["starv_coef"]] <- NULL
-        params@extensions <- params@extensions[names(params@extensions) != "mizerStarvation"]
+        params@extensions[["mizerStarvation"]] <- NULL
         return(params)
     }
 
-    # Set starvation mortality rate
-    params@species_params[["starv_coef"]] <- starv_coef
+    # Set starvation mortality rate. `starv_coef` is user input that mizer
+    # never calculates, so it is declared as a given species parameter.
+    given_species_params(params)[["starv_coef"]] <- starv_coef
 
-    # Hook into mizer
+    # Hook into mizer's mortality pipeline
     params@other_mort[["starvation"]] <- "starvMort"
-    
-    params@extensions <- getRegisteredExtensions()
 
-    return(params)
+    # Record that this extension has been applied to the object. The installed
+    # package version is stamped only when the component is first created; on
+    # later calls the existing stamp is preserved.
+    version <- if ("mizerStarvation" %in% names(params@extensions)) {
+        NULL
+    } else {
+        as.character(utils::packageVersion("mizerStarvation"))
+    }
+    params <- recordExtension(params, "mizerStarvation", version = version)
+
+    params
 }

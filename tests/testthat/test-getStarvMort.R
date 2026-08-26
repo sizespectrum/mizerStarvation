@@ -1,7 +1,7 @@
 test_that("getStarvMort works", {
     # NS model steady state has no starvation
     params <- setStarvation(NS_params)
-    zero_mort <- params@initial_n
+    zero_mort <- initialN(params)
     zero_mort[] <- 0
     sm <- zero_mort
     sm[] <- getStarvMort(params)
@@ -36,4 +36,11 @@ test_that("getStarvMort returns correct object", {
     expect_identical(dimnames(sm), 
                      dimnames(params@initial_n))
     expect_true(is.ArraySpeciesBySize(sm))
+})
+test_that("getStarvMort uses the abundances it is given", {
+    params <- setStarvation(NS_params)
+    params@metab[1, 30] <- 10
+    # Starving the community of food increases the energy deficit
+    starved <- getStarvMort(params, n_pp = initialNResource(params) / 100)
+    expect_gt(starved[1, 30], getStarvMort(params)[1, 30])
 })

@@ -9,6 +9,7 @@ You can install the development version of mizerStarvation from GitHub
 with
 
 ``` r
+
 remotes::install_github("sizespectrum/mizerStarvation")
 ```
 
@@ -18,6 +19,7 @@ This is an artificial example just to illustrate usage. We start with
 the North Sea model that comes with the mizer package.
 
 ``` r
+
 library(mizerStarvation)
 library(tidyverse)
 library(ggplot2)
@@ -32,12 +34,14 @@ plotBiomass(sim)
 We add starvation mortality
 
 ``` r
+
 params <- setStarvation(NS_params, 10)
 ```
 
 We decrease resource availability to create some starvation
 
 ``` r
+
 initialNResource(params)[w_full(params) > 0.1] <- 0
 resource_capacity(params) <- initialNResource(params) * 1.0001
 ```
@@ -47,6 +51,7 @@ of size with
 [`getStarvMort()`](https://sizespectrum.org/mizerStarvation/reference/getStarvMort.md):
 
 ``` r
+
 starv_mort <- getStarvMort(params)
 plot(starv_mort)
 ```
@@ -57,6 +62,7 @@ Of course now Saithe will go extinct, not only because of the starvation
 mortality but also because it stops growing before maturity.
 
 ``` r
+
 sim <- project(params, t_max = 30)
 plotBiomass(sim)
 ```

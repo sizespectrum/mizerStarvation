@@ -59,13 +59,26 @@ value per species. This is stored as a column of the `species_params` data
 frame:
 
 ```{r show-param, eval = FALSE}
-params@species_params[["starv_coef"]]
+species_params(params)[["starv_coef"]]
 ```
 
 Using `species_params` rather than `other_params()` is appropriate here
 because `starv_coef` varies by species. It is also the standard place mizer
 uses to keep per-species biological parameters, so it is automatically saved
 and restored with the `MizerParams` object.
+
+`setStarvation()` writes the column with the `given_species_params()`
+replacement function rather than by assigning to the `species_params` slot
+directly:
+
+```{r set-param, eval = FALSE}
+given_species_params(params)[["starv_coef"]] <- starv_coef
+```
+
+`starv_coef` is user input that mizer never calculates for itself, so
+declaring it as a *given* species parameter records that provenance. It then
+shows up in `given_species_params(params)` alongside the other parameters the
+user supplied, rather than in `calculated_species_params(params)`.
 
 # Registering with mizer on load
 
@@ -85,22 +98,44 @@ automatically if it is missing. The call is idempotent: reloading the package
 
 # Recording the extension in the params object
 
-`setStarvation()` copies the session's registered extension chain into
-`params@extensions`:
+Registering the package in `.onLoad` only announces it to the *session*. A
+`MizerParams` object additionally records which extensions were actually
+applied to it, in its `extensions` slot:
 
 ```{r show-extensions, eval = FALSE}
 params@extensions
+#> $mizerStarvation
+#>                    requirement                        version 
+#> "sizespectrum/mizerStarvation"                        "0.2.0" 
 ```
 
-Because `.onLoad` has already registered mizerStarvation by the time the user
-calls `setStarvation()`, the chain returned by `getRegisteredExtensions()`
-includes `"mizerStarvation"`. Storing this in the object lets mizer warn users
-who try to load a saved model in a session where mizerStarvation is not
-installed.
+`setStarvation()` writes that entry with `mizer::recordExtension()`:
+
+```{r record-extension, eval = FALSE}
+params <- recordExtension(params, "mizerStarvation", version = version)
+```
+
+`recordExtension()` takes the installation requirement from the session's
+registered chain, preserves any entries other extensions have already made,
+and inserts this one at the right position in the chain. This is deliberately
+narrower than copying the whole of `getRegisteredExtensions()` into the
+object: another extension package may well be loaded in the session without
+having been applied to *this* model, and the slot is a record of what was
+applied, not of what happened to be attached.
+
+The `version` argument is the version of mizerStarvation whose object layout
+the recorded component conforms to. `setStarvation()` stamps the installed
+version only when it first adds starvation mortality to a model, and passes
+`version = NULL` on subsequent calls so that an existing stamp is preserved.
+Re-stamping on an ordinary modification would let an old object claim to be
+current and so skip a migration it actually needs.
+
+Storing this record lets mizer warn users who try to load a saved model in a
+session where mizerStarvation is missing or out of date.
 
 When starvation mortality is disabled by passing `starv_coef = 0`,
-`setStarvation()` also removes `"mizerStarvation"` from `params@extensions`,
-so the saved object no longer requires the package.
+`setStarvation()` removes the `"mizerStarvation"` entry from
+`params@extensions` again, so the saved object no longer requires the package.
 
 # How the pieces fit together
 
@@ -118,13 +153,21 @@ During a projection, at each time step and for each species and size class,
 mizer calls `starvMort()`:
 
 ```{r starvMort-body, eval = FALSE}
-starvMort <- function(params, n, n_pp, n_other, ...) {
-    e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other)
-    mu_s <- -t(t(e * params@species_params$starv_coef) / params@w)
+starvMort <- function(params, n, n_pp, n_other, t = 0, ...) {
+    e <- getEReproAndGrowth(params, n = n, n_pp = n_pp, n_other = n_other,
+                            t = t)
+    starv_coef <- species_params(params)[["starv_coef"]]
+    mu_s <- -t(t(e * starv_coef) / params@w)
     mu_s[e > 0] <- 0
-    return(mu_s)
+    mu_s
 }
 ```
+
+`getMort()` calls each `other_mort` function with `params`, `n`, `n_pp`,
+`n_other`, `t` and the `component` name, so a rate function has to accept
+`...` to absorb the arguments it does not use. Note that `t` is named
+explicitly here and forwarded, so that starvation mortality is computed at the
+same time as the rest of the mortality in models whose rates depend on time.
 
 The function:
 
@@ -144,8 +187,8 @@ The result is a species-by-size matrix with the same dimensions as
 | Mechanism | Where | Purpose |
 |---|---|---|
 | `params@other_mort` | named list of rate function names | registers `starvMort` so `getMort()` calls it at each time step |
-| `params@species_params$starv_coef` | column in species parameters | stores the per-species proportionality constant |
-| `params@extensions` | named character vector | records that mizerStarvation set up this model |
+| `species_params(params)$starv_coef` | column in species parameters, written with `given_species_params<-()` | stores the per-species proportionality constant |
+| `params@extensions` | named list written with `recordExtension()` | records that mizerStarvation set up this model, and under which version |
 
 This package does not use `setRateFunction()`, `setComponent()`,
 `setExtMort()`, or S4 subclassing, because those mechanisms are either

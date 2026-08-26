@@ -7,16 +7,17 @@
 \usage{
 getStarvMort(
   params,
-  n = params@initial_n,
-  n_pp = params@initial_n_pp,
-  n_other = params@initial_n_other,
+  n = initialN(params),
+  n_pp = initialNResource(params),
+  n_other = initialNOther(params),
+  t = 0,
   ...
 )
 
-starvMort(params, n, n_pp, n_other, ...)
+starvMort(params, n, n_pp, n_other, t = 0, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams-class]{mizer::MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -24,6 +25,8 @@ starvMort(params, n, n_pp, n_other, ...)
 
 \item{n_other}{A list of abundances for other dynamical components of the
 ecosystem}
+
+\item{t}{The time for which to do the calculation. Defaults to 0.}
 
 \item{...}{Unused}
 }
