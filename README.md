@@ -14,8 +14,7 @@ This is an extension package for the mizer package
 
 <!--
 You can install the released version of mizerStarvation from [CRAN](https://CRAN.R-project.org) with: 
-
-``` r 
+&#10;``` r 
 install.packages("mizerStarvation") 
 ```
 -->
@@ -37,10 +36,12 @@ library(mizerStarvation)
 library(tidyverse)
 library(ggplot2)
 params <- NS_params
-plotSpectra(params, power = 2)
+
+sim <- project(params, t_max = 30)
+plotBiomass(sim)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
 We add starvation mortality
 
@@ -51,10 +52,8 @@ params <- setStarvation(NS_params, 10)
 We decrease resource availability to create some starvation
 
 ``` r
-capacity <- getResourceCapacity(params)
-capacity[w_full(params) > 0.1] <- 0
-params <- setResource(params, resource_capacity = capacity)
 initialNResource(params)[w_full(params) > 0.1] <- 0
+resource_capacity(params) <- initialNResource(params) * 1.0001
 ```
 
 We can calculate the starvation mortality for each species as a function
@@ -62,22 +61,10 @@ of size with `getStarvMort()`:
 
 ``` r
 starv_mort <- getStarvMort(params)
+plot(starv_mort)
 ```
 
-This returns a matrix. For plotting we turn this into a data frame with
-`melt()` and send it to ggplot:
-
-``` r
-ggplot(melt(starv_mort)) +
-    geom_line(aes(x = w, y = value, colour = sp, linetype = sp), size = 1) +
-    scale_x_log10() +
-    xlab("Size [g]") +
-    ylab("Starvation mortality [1/year]") +
-    scale_colour_manual(values = params@linecolour) +
-    scale_linetype_manual(values = params@linetype)
-```
-
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" alt="" width="100%" />
 
 Of course now Saithe will go extinct, not only because of the starvation
 mortality but also because it stops growing before maturity.
@@ -87,4 +74,4 @@ sim <- project(params, t_max = 30)
 plotBiomass(sim)
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />

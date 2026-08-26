@@ -3,9 +3,14 @@
 #' This is an extension package for the mizer package
 #' (https://sizespectrum.org/mizer/) to implement starvation mortality.
 #'
-#' @import mizer
-#' @importFrom methods validObject
-#' @docType package
+#' @import mizer assertthat
+#' @importFrom utils packageVersion
 #' @name mizerStarvation
 #' @aliases mizerStarvation-package
-NULL
+#' @md
+#' @keywords internal
+"_PACKAGE"
+
+.onLoad <- function(libname, pkgname) {
+    mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerStarvation")
+}

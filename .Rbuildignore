@@ -4,3 +4,17 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.positai$
+^\.claude$
+^\.posit/assistant$
+^\.agents$
+^\.codex$
+^\.cursor$
+^\.gemini$
+^\.vscode$
+^\.mcp\.json$
+^\.posit$
+^AGENTS\.md$
+^CLAUDE\.md$
+^GEMINI\.md$
+^MIZER-AGENTS\.md$
