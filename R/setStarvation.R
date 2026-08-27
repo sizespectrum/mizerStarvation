@@ -26,7 +26,7 @@ setStarvation <- function(params,
 
     # Disable starvation mortality if starv_coef = 0
     if (all(starv_coef == 0)) {
-        params@other_mort[["starvation"]] <- NULL
+        other_mort(params)[["starvation"]] <- NULL
         # Hand `starv_coef` back to mizer and then drop the column entirely
         given_species_params(params)[["starv_coef"]] <- NULL
         params@species_params[["starv_coef"]] <- NULL
@@ -38,8 +38,10 @@ setStarvation <- function(params,
     # never calculates, so it is declared as a given species parameter.
     given_species_params(params)[["starv_coef"]] <- starv_coef
 
-    # Hook into mizer's mortality pipeline
-    params@other_mort[["starvation"]] <- "starvMort"
+    # Hook into mizer's mortality pipeline. `other_mort()` is the accessor for
+    # the extra mortality contributions that carry no state of their own, so
+    # there is no need for a component with its own dynamics.
+    other_mort(params)[["starvation"]] <- "starvMort"
 
     # Record that this extension has been applied to the object. The installed
     # package version is stamped only when the component is first created; on

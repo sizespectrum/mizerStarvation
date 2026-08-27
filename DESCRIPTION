@@ -15,7 +15,7 @@ Description: This is an extension package to implement starvation mortality
     in the mizer package.
 License: GPL-3
 Depends:
-  mizer (>= 3.3.0)
+  mizer (>= 3.3.0.9000)
 Imports: 
   utils,
   assertthat

@@ -1,6 +1,6 @@
 test_that("Starvation mortality is correctly set and unset", {
     params <- setStarvation(NS_params)
-    expect_identical(params@other_mort$starvation, "starvMort")
+    expect_identical(other_mort(params)$starvation, "starvMort")
     # `$` on a species parameter table returns a vector named by species
     expect_equal(unname(species_params(params)$starv_coef), rep(10, 12))
     # `starv_coef` is recorded as user input, not as something mizer calculated
@@ -21,7 +21,7 @@ test_that("Starvation mortality is correctly set and unset", {
     expect_identical(getMetadata(params3)$extensions[["mizerStarvation"]], ext)
     # Now unset
     params <- setStarvation(params, starv_coef = 0)
-    expect_equal(params@other_mort, list(), check.attributes = FALSE)
+    expect_equal(other_mort(params), list(), check.attributes = FALSE)
     expect_null(species_params(params)$starv_coef)
     expect_false("starv_coef" %in% names(given_species_params(params)))
     expect_false("mizerStarvation" %in% names(params@extensions))
