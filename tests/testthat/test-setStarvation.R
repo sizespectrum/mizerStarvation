@@ -24,5 +24,5 @@ test_that("Starvation mortality is correctly set and unset", {
     expect_equal(other_mort(params), list(), check.attributes = FALSE)
     expect_null(species_params(params)$starv_coef)
     expect_false("starv_coef" %in% names(given_species_params(params)))
-    expect_false("mizerStarvation" %in% names(params@extensions))
+    expect_false("mizerStarvation" %in% names(getMetadata(params)$extensions))
 })

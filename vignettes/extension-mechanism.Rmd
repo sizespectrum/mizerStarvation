@@ -82,43 +82,25 @@ because `starv_coef` varies by species. It is also the standard place mizer
 uses to keep per-species biological parameters, so it is automatically saved
 and restored with the `MizerParams` object.
 
-`setStarvation()` writes the column with the `given_species_params()`
-replacement function rather than by assigning to the `species_params` slot
-directly:
+`setStarvation()` writes the column through `species_params<-()` rather than
+by assigning to the `species_params` slot directly:
 
 ```{r set-param, eval = FALSE}
-given_species_params(params)[["starv_coef"]] <- starv_coef
+species_params(params)$starv_coef <- starv_coef
 ```
 
 `starv_coef` is user input that mizer never calculates for itself, so
-declaring it as a *given* species parameter records that provenance. It then
-shows up in `given_species_params(params)` alongside the other parameters the
+setting it on `species_params()` automatically updates `given_species_params()`.
+It then shows up in `given_species_params(params)` alongside the other parameters the
 user supplied, rather than in `calculated_species_params(params)`.
-
-# Registering with mizer on load
-
-When mizerStarvation is loaded, its `.onLoad` hook registers the package with
-mizer:
-
-```r
-.onLoad <- function(libname, pkgname) {
-  mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerStarvation")
-}
-```
-
-This adds `mizerStarvation` to the session's extension chain. The `requirement`
-string is a `pak` installation spec, so mizer can install the package
-automatically if it is missing. The call is idempotent: reloading the package
-(e.g. via `devtools::load_all()`) does not modify the chain a second time.
 
 # Recording the extension in the params object
 
-Registering the package in `.onLoad` only announces it to the *session*. A
-`MizerParams` object additionally records which extensions were actually
-applied to it, in its `extensions` slot:
+A `MizerParams` object records which extensions were actually applied to it in
+its metadata:
 
 ```{r show-extensions, eval = FALSE}
-params@extensions
+getMetadata(params)$extensions
 #> $mizerStarvation
 #>                    requirement                        version 
 #> "sizespectrum/mizerStarvation"                        "0.2.0" 
@@ -127,16 +109,17 @@ params@extensions
 `setStarvation()` writes that entry with `mizer::recordExtension()`:
 
 ```{r record-extension, eval = FALSE}
-params <- recordExtension(params, "mizerStarvation", version = version)
+params <- recordExtension(
+    params, "mizerStarvation",
+    version = version,
+    requirement = "sizespectrum/mizerStarvation"
+)
 ```
 
-`recordExtension()` takes the installation requirement from the session's
-registered chain, preserves any entries other extensions have already made,
-and inserts this one at the right position in the chain. This is deliberately
-narrower than copying the whole of `getRegisteredExtensions()` into the
-object: another extension package may well be loaded in the session without
-having been applied to *this* model, and the slot is a record of what was
-applied, not of what happened to be attached.
+`recordExtension()` records the installation requirement, preserves any
+entries other extensions have already made, and adds this one to the object.
+The slot is a record of what was applied to this model, not of what happened to
+be attached in the session.
 
 The `version` argument is the version of mizerStarvation whose object layout
 the recorded component conforms to. `setStarvation()` stamps the installed
@@ -202,8 +185,8 @@ The result is a species-by-size matrix with the same dimensions as
 | Mechanism | Where | Purpose |
 |---|---|---|
 | `other_mort(params)` | named list of rate function names | registers `starvMort` so `getMort()` calls it at each time step |
-| `species_params(params)$starv_coef` | column in species parameters, written with `given_species_params<-()` | stores the per-species proportionality constant |
-| `params@extensions` | named list written with `recordExtension()` | records that mizerStarvation set up this model, and under which version |
+| `species_params(params)$starv_coef` | column in species parameters, written with `species_params<-()` | stores the per-species proportionality constant |
+| `getMetadata(params)$extensions` | named list written with `recordExtension()` | records that mizerStarvation set up this model, and under which version |
 
 This package uses none of the neighbouring mechanisms, and it is worth being
 precise about why:
@@ -220,6 +203,6 @@ precise about why:
   `dynamics_fun` to update. A contribution registered with `setComponent()`
   belongs to its component: `getComponent()` reports it, `removeComponent()`
   removes it, and `other_mort()` does not list it.
-- S4 subclassing changes what mizer's generic functions return. Nothing in
-  mizer's output needs to change here, so this stays a metadata-only
-  extension.
+- S3 dispatching extension classes change what mizer's generic functions return.
+  Nothing in mizer's output needs to change here, so this stays a non-dispatching,
+  metadata-only extension.

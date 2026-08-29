@@ -27,16 +27,16 @@ setStarvation <- function(params,
     # Disable starvation mortality if starv_coef = 0
     if (all(starv_coef == 0)) {
         other_mort(params)[["starvation"]] <- NULL
-        # Hand `starv_coef` back to mizer and then drop the column entirely
-        given_species_params(params)[["starv_coef"]] <- NULL
-        params@species_params[["starv_coef"]] <- NULL
-        params@extensions[["mizerStarvation"]] <- NULL
+        # Drop the column entirely
+        species_params(params)$starv_coef <- NULL
+        if (length(params$extensions) > 0 && "mizerStarvation" %in% names(params$extensions)) {
+            params$extensions[["mizerStarvation"]] <- NULL
+        }
         return(params)
     }
 
-    # Set starvation mortality rate. `starv_coef` is user input that mizer
-    # never calculates, so it is declared as a given species parameter.
-    given_species_params(params)[["starv_coef"]] <- starv_coef
+    # Set starvation mortality parameter.
+    species_params(params)$starv_coef <- starv_coef
 
     # Hook into mizer's mortality pipeline. `other_mort()` is the accessor for
     # the extra mortality contributions that carry no state of their own, so
@@ -46,12 +46,17 @@ setStarvation <- function(params,
     # Record that this extension has been applied to the object. The installed
     # package version is stamped only when the component is first created; on
     # later calls the existing stamp is preserved.
-    version <- if ("mizerStarvation" %in% names(params@extensions)) {
+    extensions <- getMetadata(params)$extensions
+    version <- if ("mizerStarvation" %in% names(extensions)) {
         NULL
     } else {
         as.character(utils::packageVersion("mizerStarvation"))
     }
-    params <- recordExtension(params, "mizerStarvation", version = version)
+    params <- mizer::recordExtension(
+        params, "mizerStarvation",
+        version = version,
+        requirement = "sizespectrum/mizerStarvation"
+    )
 
     params
 }

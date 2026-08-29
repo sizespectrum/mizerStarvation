@@ -8,7 +8,7 @@
 #' \deqn{\mu_s(w) = \frac{-E_r(w)}{w} {\tt starv\_coeff} }{mu_s(w) = -E_r(w)/w * starv_coeff}
 #' The proportionality constant `starv_coeff` is set with `setStarvation()`.
 #'
-#' @param params A [mizer::MizerParams-class] object
+#' @param params A [MizerParams] object
 #' @param n A matrix of species abundances (species x size).
 #' @param n_pp A vector of the plankton abundance by size
 #' @param n_other A list of abundances for other dynamical components of the
