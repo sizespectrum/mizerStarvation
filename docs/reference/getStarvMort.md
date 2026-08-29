@@ -29,7 +29,7 @@ starvMort(params, n, n_pp, n_other, t = 0, ...)
 - params:
 
   A
-  [mizer::MizerParams](https://sizespectrum.org/mizer/reference/MizerParams-class.html)
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
   object
 
 - n:
