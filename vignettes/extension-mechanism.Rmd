@@ -20,8 +20,12 @@ library(mizerStarvation)
 
 The mizer package provides several routes for extending its behaviour without
 editing the mizer source code. A full description of these mechanisms is given
-in `vignette("extensions", package = "mizer")`. This vignette explains which
-of those mechanisms mizerStarvation uses and why.
+in the [guide to extending
+mizer](https://sizespectrum.org/mizer/articles/guide-extend-mizer.html), and
+the [guide to creating an extension
+package](https://sizespectrum.org/mizer/articles/guide-create-extension-package.html)
+covers turning one into a package. This vignette explains which of those
+mechanisms mizerStarvation uses and why.
 
 The starvation mortality added by this package is an *additional* mortality
 source that runs alongside the standard background, fishing, and predation
@@ -30,22 +34,33 @@ mechanism that *adds* to the mortality rate pipeline rather than replacing it.
 
 # The `other_mort` mechanism
 
-The `MizerParams` object carries a slot `other_mort`: a named list of rate
-function names. During every time step, `getMort()` calls each function in
-this list and adds its return value to the total per-capita mortality rate.
-This is the correct tool when:
+A `MizerParams` object carries a register of extra mortality contributions:
+a named list of rate function names, reached with `other_mort()`. During
+every time step, `getMort()` calls each function in this list and adds its
+return value to the total per-capita mortality rate. This is the correct
+tool when:
 
 - the extra mortality source is dynamical (it responds to the current
-  community state at each time step), and
+  community state at each time step),
 - it should be superimposed on the standard mortality terms rather than
-  replacing them.
+  replacing them, and
+- it carries no state of its own that has to be updated from one time step
+  to the next.
 
 mizerStarvation registers its rate function into this list:
 
 ```{r show-slot, eval = FALSE}
-params@other_mort[["starvation"]]
+other_mort(params)[["starvation"]] <- "starvMort"
+other_mort(params)
+#> $starvation
 #> [1] "starvMort"
 ```
+
+Assigning `NULL` to an entry removes it again, which is how
+`setStarvation(params, starv_coef = 0)` switches starvation mortality off.
+
+`other_encounter()` is the same mechanism for a contribution to the
+encounter rate.
 
 The string `"starvMort"` is the name of the exported function
 `mizerStarvation::starvMort()`. mizer looks up this name in the package
@@ -146,7 +161,7 @@ params <- setStarvation(params, starv_coef = 10)
 ```
 
 Passing `starv_coef = 0` reverses the change: it removes the `"starvation"`
-entry from `other_mort`, removes the `starv_coef` column from
+entry from `other_mort()`, removes the `starv_coef` column from
 `species_params`, and removes `"mizerStarvation"` from `params@extensions`.
 
 During a projection, at each time step and for each species and size class,
@@ -163,7 +178,7 @@ starvMort <- function(params, n, n_pp, n_other, t = 0, ...) {
 }
 ```
 
-`getMort()` calls each `other_mort` function with `params`, `n`, `n_pp`,
+`getMort()` calls each registered function with `params`, `n`, `n_pp`,
 `n_other`, `t` and the `component` name, so a rate function has to accept
 `...` to absorb the arguments it does not use. Note that `t` is named
 explicitly here and forwarded, so that starvation mortality is computed at the
@@ -186,11 +201,25 @@ The result is a species-by-size matrix with the same dimensions as
 
 | Mechanism | Where | Purpose |
 |---|---|---|
-| `params@other_mort` | named list of rate function names | registers `starvMort` so `getMort()` calls it at each time step |
+| `other_mort(params)` | named list of rate function names | registers `starvMort` so `getMort()` calls it at each time step |
 | `species_params(params)$starv_coef` | column in species parameters, written with `given_species_params<-()` | stores the per-species proportionality constant |
 | `params@extensions` | named list written with `recordExtension()` | records that mizerStarvation set up this model, and under which version |
 
-This package does not use `setRateFunction()`, `setComponent()`,
-`setExtMort()`, or S4 subclassing, because those mechanisms are either
-designed for replacing rather than augmenting existing rates, or add more
-infrastructure than this simple additive mortality term requires.
+This package uses none of the neighbouring mechanisms, and it is worth being
+precise about why:
+
+- `setRateFunction()` **replaces** mizer's calculation of a rate. Starvation
+  mortality is an addition to the existing mortality, not a different way of
+  computing it.
+- `setExtMort()` sets a **fixed array**. Starvation mortality depends on the
+  current energy balance, so it has to be recomputed from the community state
+  at every time step.
+- `setComponent()` is for a component with **dynamics of its own** — a
+  detritus or carrion pool whose state is carried from one time step to the
+  next. Starvation mortality keeps no state, so there would be nothing for
+  `dynamics_fun` to update. A contribution registered with `setComponent()`
+  belongs to its component: `getComponent()` reports it, `removeComponent()`
+  removes it, and `other_mort()` does not list it.
+- S4 subclassing changes what mizer's generic functions return. Nothing in
+  mizer's output needs to change here, so this stays a metadata-only
+  extension.
